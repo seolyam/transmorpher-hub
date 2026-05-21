@@ -1,3 +1,10 @@
 # Documentation
 /documentation/
 
+# Agent/Tool cache and system files
+.agents/
+*.agents/
+skills-lock.json
+**/skills-lock.json
+
+
