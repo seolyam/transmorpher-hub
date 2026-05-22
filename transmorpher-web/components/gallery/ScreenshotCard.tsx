@@ -1,6 +1,6 @@
 'use client';
 import Image from 'next/image';
-import { GalleryItem } from '@/lib/mockData';
+import { GalleryItem } from '@/lib/types';
 import { useState } from 'react';
 
 interface ScreenshotCardProps {

@@ -4,7 +4,7 @@ import Navbar from '@/components/gallery/Navbar';
 import ScreenshotCard from '@/components/gallery/ScreenshotCard';
 import UploadModal from '@/components/gallery/UploadModal';
 import { createBrowserClient } from '@/src/lib/supabase';
-import { GalleryItem } from '@/lib/mockData';
+import { GalleryItem } from '@/lib/types';
 
 export const RACES = {
   Alliance: ['Human', 'Dwarf', 'Night Elf', 'Gnome', 'Draenei'],
