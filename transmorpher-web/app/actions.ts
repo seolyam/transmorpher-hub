@@ -5,12 +5,11 @@ import { createServerClient } from "@/src/lib/supabase";
 import { isValidLoadoutExportString, loadoutExportHint } from "@/lib/loadoutCodec";
 
 const s3 = new S3Client({
-  forcePathStyle: true,
-  region: "us-east-1",
-  endpoint: process.env.SUPABASE_S3_ENDPOINT,
+  region: "auto",
+  endpoint: process.env.CLOUDFLARE_R2_ENDPOINT,
   credentials: {
-    accessKeyId: process.env.SUPABASE_S3_ACCESS_KEY_ID || "",
-    secretAccessKey: process.env.SUPABASE_S3_SECRET_ACCESS_KEY || "",
+    accessKeyId: process.env.CLOUDFLARE_R2_ACCESS_KEY_ID || "",
+    secretAccessKey: process.env.CLOUDFLARE_R2_SECRET_ACCESS_KEY || "",
   },
 });
 
@@ -39,17 +38,19 @@ export async function uploadLoadout(formData: FormData) {
     const fileExtension = file.name.split('.').pop() || 'png';
     const fileName = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}.${fileExtension}`;
 
-    // Upload to Supabase Storage using S3 client
+    const bucketName = process.env.CLOUDFLARE_R2_BUCKET_NAME || "transmorpher-media";
+    
+    // Upload to Cloudflare R2 using S3 client
     await s3.send(new PutObjectCommand({
-      Bucket: "loadout-images",
+      Bucket: bucketName,
       Key: fileName,
       Body: buffer,
       ContentType: file.type,
     }));
 
     // Construct the public URL
-    const projectId = "rnkoetwcsfihpzaacesr";
-    const imageUrl = `https://${projectId}.supabase.co/storage/v1/object/public/loadout-images/${fileName}`;
+    const publicUrl = process.env.NEXT_PUBLIC_R2_PUBLIC_URL?.replace(/\/$/, "") || "";
+    const imageUrl = `${publicUrl}/${fileName}`;
 
     // Insert loadout record to database
     const supabase = await createServerClient() as any;
