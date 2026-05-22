@@ -16,11 +16,13 @@ const s3 = new S3Client({
 export async function uploadLoadout(formData: FormData) {
   try {
     const title = formData.get("title") as string;
-    const className = formData.get("class") as string;
+    const race = formData.get("race") as string;
+    const gender = formData.get("gender") as string;
+    const visualWeight = formData.get("visualWeight") as string;
     const exportString = formData.get("exportString") as string;
     const file = formData.get("screenshot") as File;
 
-    if (!title || !className || !exportString || !file) {
+    if (!title || !race || !gender || !visualWeight || !exportString || !file) {
       return { success: false, error: "Missing required fields" };
     }
 
@@ -71,27 +73,16 @@ export async function uploadLoadout(formData: FormData) {
       }
     }
 
-    const classMap: Record<string, number> = {
-      'Warrior': 1,
-      'Paladin': 2,
-      'Hunter': 3,
-      'Rogue': 4,
-      'Priest': 5,
-      'Death Knight': 6,
-      'Shaman': 7,
-      'Mage': 8,
-      'Warlock': 9,
-      'Druid': 11,
-    };
-
     const { data, error } = await supabase
       .from("loadouts")
       .insert({
         title,
+        race,
+        gender,
+        visual_weight: visualWeight,
         import_string: exportString,
         image_url: imageUrl,
         author_id: userId,
-        class_id: classMap[className] || null,
         parsed_data: { items: [] },
       })
       .select()
