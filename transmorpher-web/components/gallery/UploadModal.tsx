@@ -2,6 +2,7 @@
 import { useState, useRef } from 'react';
 import Image from 'next/image';
 import { uploadLoadout } from '@/app/actions';
+import imageCompression from 'browser-image-compression';
 
 interface UploadModalProps {
   isOpen: boolean;
@@ -20,6 +21,7 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
   const [exportString, setExportString] = useState('');
   
   const [isUploading, setIsUploading] = useState(false);
+  const [isCompressing, setIsCompressing] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
@@ -90,15 +92,25 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
     }
 
     setIsUploading(true);
+    setIsCompressing(true);
 
     try {
+      const options = {
+        maxSizeMB: 0.5,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      };
+      
+      const compressedFile = await imageCompression(file, options);
+      setIsCompressing(false);
+
       const formData = new FormData();
       formData.append("title", title);
       formData.append("race", race);
       formData.append("gender", gender);
       formData.append("visualWeight", visualWeight);
       formData.append("exportString", exportString);
-      formData.append("screenshot", file);
+      formData.append("screenshot", compressedFile);
 
       const result = await uploadLoadout(formData);
 
@@ -122,6 +134,7 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
     } catch (e: any) {
       setErrorMsg(e.message || "An unexpected error occurred.");
     } finally {
+      setIsCompressing(false);
       setIsUploading(false);
     }
   };
@@ -310,7 +323,7 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                 </svg>
-                Publishing...
+                {isCompressing ? 'Compressing...' : 'Publishing...'}
               </>
             ) : 'Publish Loadout'}
           </button>
