@@ -13,7 +13,7 @@ export const RACES = {
 export const WEIGHTS = ['Light', 'Medium', 'Heavy', 'Massive'];
 export const GENDERS = ['Male', 'Female'];
 
-export default function Home() {
+export default function Trending() {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -62,6 +62,8 @@ export default function Home() {
             exportString: loadout.import_string,
           };
         });
+        // Sort by upvotes descending
+        formatted.sort((a, b) => b.upvotes - a.upvotes);
         setItems(formatted);
       }
     } catch (e: any) {
@@ -99,11 +101,10 @@ export default function Home() {
       {/* Hero Section */}
       <section className="w-full max-w-[1440px] mx-auto px-6 py-12 flex flex-col items-center justify-center text-center gap-6 animate-in fade-in duration-500">
         <h1 className="font-space font-bold text-4xl md:text-5xl text-slate-50 tracking-tight">
-          Discover WotLK Transmogs
+          Trending Transmogs
         </h1>
         <p className="text-slate-400 text-lg max-w-xl">
-          Share your World of Warcraft: Wrath of the Lich King transmog sets with the community. 
-          Upload in-game screenshots and copy export strings instantly.
+          The most popular World of Warcraft: Wrath of the Lich King transmog sets voted by the community.
         </p>
 
         {/* Filters Toggle */}

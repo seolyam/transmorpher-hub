@@ -8,7 +8,7 @@
   --color-zinc-900: #18181b;
   --color-zinc-950: #09090b;
   
-  --color-legendary-orange: #ff8000;
+  --color-frost-blue: #00bfff;
   --color-epic-purple: #a335ee;
   --color-rare-blue: #0070dd;
   --color-uncommon-green: #1eff00;
@@ -29,19 +29,27 @@
   --font-mono: "JetBrains Mono", monospace;
 }
 
+:root {
+  --color-frost-blue: #00bfff;
+  --color-epic-purple: #a335ee;
+  --color-rare-blue: #0070dd;
+  --color-uncommon-green: #1eff00;
+  --color-legendary-orange: #ff8000;
+}
+
 @layer base {
   body {
-    @apply bg-zinc-950 text-zinc-50 font-inter antialiased min-h-screen selection:bg-epic-purple/30 selection:text-white;
+    @apply bg-slate-950 text-slate-50 font-inter antialiased min-h-screen selection:bg-frost-blue/30 selection:text-white;
   }
 }
 
 @layer utilities {
-  .text-glow-orange {
-    text-shadow: 0 0 10px rgba(255, 128, 0, 0.5);
+  .text-glow-frost {
+    text-shadow: 0 0 10px rgba(0, 191, 255, 0.5);
   }
   
-  .shadow-glow-orange {
-    box-shadow: 0 10px 30px -10px rgba(255, 128, 0, 0.2);
+  .shadow-glow-frost {
+    box-shadow: 0 10px 30px -10px rgba(0, 191, 255, 0.3);
   }
 
   .shadow-glow-purple {
@@ -54,12 +62,12 @@
     height: 8px;
   }
   ::-webkit-scrollbar-track {
-    @apply bg-zinc-950;
+    @apply bg-slate-950;
   }
   ::-webkit-scrollbar-thumb {
-    @apply bg-zinc-800 rounded-full border-2 border-solid border-zinc-950;
+    @apply bg-slate-800 rounded-full border-2 border-solid border-slate-950;
   }
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-zinc-700;
+    @apply bg-slate-700;
   }
 }

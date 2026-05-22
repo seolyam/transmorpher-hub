@@ -13,7 +13,7 @@ export const RACES = {
 export const WEIGHTS = ['Light', 'Medium', 'Heavy', 'Massive'];
 export const GENDERS = ['Male', 'Female'];
 
-export default function Home() {
+export default function Newest() {
   const [isUploadOpen, setIsUploadOpen] = useState(false);
   const [items, setItems] = useState<GalleryItem[]>([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -99,11 +99,10 @@ export default function Home() {
       {/* Hero Section */}
       <section className="w-full max-w-[1440px] mx-auto px-6 py-12 flex flex-col items-center justify-center text-center gap-6 animate-in fade-in duration-500">
         <h1 className="font-space font-bold text-4xl md:text-5xl text-slate-50 tracking-tight">
-          Discover WotLK Transmogs
+          Newest Transmogs
         </h1>
         <p className="text-slate-400 text-lg max-w-xl">
-          Share your World of Warcraft: Wrath of the Lich King transmog sets with the community. 
-          Upload in-game screenshots and copy export strings instantly.
+          The most recently uploaded World of Warcraft: Wrath of the Lich King transmog sets from the community.
         </p>
 
         {/* Filters Toggle */}

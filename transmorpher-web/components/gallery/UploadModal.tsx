@@ -14,7 +14,9 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   
   const [title, setTitle] = useState('');
-  const [className, setClassName] = useState('');
+  const [race, setRace] = useState('');
+  const [gender, setGender] = useState('');
+  const [visualWeight, setVisualWeight] = useState('');
   const [exportString, setExportString] = useState('');
   
   const [isUploading, setIsUploading] = useState(false);
@@ -66,8 +68,16 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
       setErrorMsg("Please enter a loadout title.");
       return;
     }
-    if (!className) {
-      setErrorMsg("Please select a WoW class.");
+    if (!race) {
+      setErrorMsg("Please select a Race.");
+      return;
+    }
+    if (!gender) {
+      setErrorMsg("Please select a Gender.");
+      return;
+    }
+    if (!visualWeight) {
+      setErrorMsg("Please select a Visual Weight.");
       return;
     }
     if (!file) {
@@ -84,7 +94,9 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
     try {
       const formData = new FormData();
       formData.append("title", title);
-      formData.append("class", className);
+      formData.append("race", race);
+      formData.append("gender", gender);
+      formData.append("visualWeight", visualWeight);
       formData.append("exportString", exportString);
       formData.append("screenshot", file);
 
@@ -94,7 +106,9 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
         setSuccessMsg("Loadout published successfully!");
         // Clear form
         setTitle('');
-        setClassName('');
+        setRace('');
+        setGender('');
+        setVisualWeight('');
         setExportString('');
         setFile(null);
         setPreviewUrl(null);
@@ -116,21 +130,21 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
       {/* Blurred Backdrop */}
       <div 
-        className="absolute inset-0 bg-zinc-950/40 backdrop-blur-xl"
+        className="absolute inset-0 bg-slate-950/40 backdrop-blur-xl"
         onClick={onClose}
       />
 
       {/* Modal Container */}
       <div 
-        className="relative w-full max-w-[600px] bg-zinc-900 rounded-xl border border-zinc-800 shadow-glow-purple flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-[600px] bg-slate-900 rounded-xl border border-slate-800 shadow-glow-purple flex flex-col overflow-hidden animate-in zoom-in-95 duration-200"
         style={{ borderTopColor: 'var(--color-epic-purple)' }}
       >
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-zinc-800/50">
+        <div className="flex items-center justify-between p-6 border-b border-slate-800/50">
           <h2 className="font-space font-bold text-2xl text-white">Upload Transmog Loadout</h2>
           <button 
             onClick={onClose}
-            className="text-zinc-500 hover:text-white transition-colors rounded-md p-1 hover:bg-zinc-800"
+            className="text-slate-500 hover:text-white transition-colors rounded-md p-1 hover:bg-slate-800"
           >
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-5 h-5">
               <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
@@ -152,43 +166,77 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
           )}
           
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-zinc-300">Loadout Title</label>
+            <label className="text-sm font-medium text-slate-300">Loadout Title</label>
             <input 
               type="text" 
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g., Shadowmourne ICC Set"
-              className="bg-zinc-950 border border-zinc-800 rounded-md px-4 py-2.5 text-zinc-50 focus:outline-none focus:border-epic-purple focus:ring-1 focus:ring-epic-purple/50 transition-all placeholder:text-zinc-600"
+              className="bg-slate-950 border border-slate-800 rounded-md px-4 py-2.5 text-slate-50 focus:outline-none focus:border-epic-purple focus:ring-1 focus:ring-epic-purple/50 transition-all placeholder:text-slate-600"
             />
           </div>
 
-          <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-zinc-300">Class</label>
-            <select 
-              value={className}
-              onChange={(e) => setClassName(e.target.value)}
-              className="bg-zinc-950 border border-zinc-800 rounded-md px-4 py-2.5 text-zinc-50 focus:outline-none focus:border-epic-purple focus:ring-1 focus:ring-epic-purple/50 transition-all appearance-none"
-            >
-              <option value="" disabled>Select Class</option>
-              <option value="Warrior">Warrior</option>
-              <option value="Paladin">Paladin</option>
-              <option value="Hunter">Hunter</option>
-              <option value="Rogue">Rogue</option>
-              <option value="Priest">Priest</option>
-              <option value="Death Knight">Death Knight</option>
-              <option value="Shaman">Shaman</option>
-              <option value="Mage">Mage</option>
-              <option value="Warlock">Warlock</option>
-              <option value="Druid">Druid</option>
-            </select>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-slate-300">Race</label>
+              <select 
+                value={race}
+                onChange={(e) => setRace(e.target.value)}
+                className="bg-slate-950 border border-slate-800 rounded-md px-4 py-2.5 text-slate-50 focus:outline-none focus:border-epic-purple focus:ring-1 focus:ring-epic-purple/50 transition-all appearance-none"
+              >
+                <option value="" disabled>Select Race</option>
+                <optgroup label="Alliance">
+                  <option value="Human">Human</option>
+                  <option value="Dwarf">Dwarf</option>
+                  <option value="Night Elf">Night Elf</option>
+                  <option value="Gnome">Gnome</option>
+                  <option value="Draenei">Draenei</option>
+                </optgroup>
+                <optgroup label="Horde">
+                  <option value="Orc">Orc</option>
+                  <option value="Undead">Undead</option>
+                  <option value="Tauren">Tauren</option>
+                  <option value="Troll">Troll</option>
+                  <option value="Blood Elf">Blood Elf</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-slate-300">Gender</label>
+              <select 
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                className="bg-slate-950 border border-slate-800 rounded-md px-4 py-2.5 text-slate-50 focus:outline-none focus:border-epic-purple focus:ring-1 focus:ring-epic-purple/50 transition-all appearance-none"
+              >
+                <option value="" disabled>Select</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-slate-300">Visual Weight</label>
+              <select 
+                value={visualWeight}
+                onChange={(e) => setVisualWeight(e.target.value)}
+                className="bg-slate-950 border border-slate-800 rounded-md px-4 py-2.5 text-slate-50 focus:outline-none focus:border-epic-purple focus:ring-1 focus:ring-epic-purple/50 transition-all appearance-none"
+              >
+                <option value="" disabled>Select Weight</option>
+                <option value="Light">Light</option>
+                <option value="Medium">Medium</option>
+                <option value="Heavy">Heavy</option>
+                <option value="Massive">Massive</option>
+              </select>
+            </div>
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-zinc-300">Screenshot</label>
+            <label className="text-sm font-medium text-slate-300">Screenshot</label>
             <div 
-              className={`relative flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-md bg-zinc-950 transition-colors ${
-                dragActive ? 'border-epic-purple bg-epic-purple/5' : 'border-zinc-800 hover:border-zinc-700'
-              } ${previewUrl ? 'p-1 border-solid border-zinc-800' : ''}`}
+              className={`relative flex flex-col items-center justify-center p-6 border-2 border-dashed rounded-md bg-slate-950 transition-colors ${
+                dragActive ? 'border-epic-purple bg-epic-purple/5' : 'border-slate-800 hover:border-slate-700'
+              } ${previewUrl ? 'p-1 border-solid border-slate-800' : ''}`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
@@ -204,7 +252,7 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
               />
               
               {previewUrl ? (
-                <div className="relative w-full aspect-video rounded-sm overflow-hidden bg-zinc-900 group">
+                <div className="relative w-full aspect-video rounded-sm overflow-hidden bg-slate-900 group">
                   <Image 
                     src={previewUrl} 
                     alt="Preview" 
@@ -218,43 +266,43 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
                 </div>
               ) : (
                 <div className="flex flex-col items-center text-center cursor-pointer pointer-events-none gap-2">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-zinc-500">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-slate-500">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
                     <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0zM18.75 10.5h.008v.008h-.008V10.5z" />
                   </svg>
-                  <p className="text-sm text-zinc-400">Drag and drop your in-game screenshot here</p>
-                  <p className="text-xs text-zinc-600 mt-1">JPEG, PNG up to 5MB</p>
+                  <p className="text-sm text-slate-400">Drag and drop your in-game screenshot here</p>
+                  <p className="text-xs text-slate-600 mt-1">JPEG, PNG up to 5MB</p>
                 </div>
               )}
             </div>
           </div>
 
           <div className="flex flex-col gap-1.5">
-            <label className="text-sm font-medium text-zinc-300">Export String</label>
+            <label className="text-sm font-medium text-slate-300">Export String</label>
             <textarea 
               value={exportString}
               onChange={(e) => setExportString(e.target.value)}
               placeholder="Paste your Transmorpher addon export string here..."
               rows={4}
-              className="bg-zinc-950 border border-zinc-800 rounded-md px-4 py-3 text-zinc-50 font-mono text-xs focus:outline-none focus:border-epic-purple focus:ring-1 focus:ring-epic-purple/50 transition-all placeholder:text-zinc-600 resize-none"
+              className="bg-slate-950 border border-slate-800 rounded-md px-4 py-3 text-slate-50 font-mono text-xs focus:outline-none focus:border-epic-purple focus:ring-1 focus:ring-epic-purple/50 transition-all placeholder:text-slate-600 resize-none"
             />
           </div>
 
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 sm:px-6 sm:py-4 bg-zinc-950/50 border-t border-zinc-800 flex justify-end gap-3">
+        <div className="p-4 sm:px-6 sm:py-4 bg-slate-950/50 border-t border-slate-800 flex justify-end gap-3">
           <button 
             onClick={onClose}
             disabled={isUploading}
-            className="px-4 py-2 text-sm font-medium text-zinc-300 hover:text-white hover:bg-zinc-800 rounded-md transition-colors disabled:opacity-50"
+            className="px-4 py-2 text-sm font-medium text-slate-300 hover:text-white hover:bg-slate-800 rounded-md transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
           <button 
             onClick={handleSubmit}
             disabled={isUploading}
-            className="px-5 py-2 text-sm font-medium text-white bg-legendary-orange hover:brightness-110 hover:shadow-glow-orange rounded-md transition-all flex items-center gap-2 disabled:opacity-50"
+            className="px-5 py-2 text-sm font-medium text-white bg-frost-blue hover:brightness-110 hover:shadow-glow-frost rounded-md transition-all flex items-center gap-2 disabled:opacity-50"
           >
             {isUploading ? (
               <>
