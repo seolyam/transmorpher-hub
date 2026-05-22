@@ -22,7 +22,6 @@
 
 import { createBrowserClient as _createBrowserClient } from "@supabase/ssr";
 import { createServerClient as _createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
 import type { Database } from "@/src/types/database.types";
 
 // ---------------------------------------------------------------------------
@@ -56,6 +55,7 @@ function getSupabaseAnonKey(): string {
 // ---------------------------------------------------------------------------
 
 export async function createServerClient() {
+  const { cookies } = await import("next/headers");
   const cookieStore = await cookies();
 
   return _createServerClient<Database>(
