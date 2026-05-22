@@ -1,0 +1,16 @@
+# Build and Binaries
+StealthMorpher/build/
+*.dll
+*.exe
+*.rar
+*.vcxproj*
+*.sln
+*.filters
+*.user
+*.cache
+*.stamp
+
+# Transmorpher DB files
+Transmorpher/db/TitlesDB.lua
+
+

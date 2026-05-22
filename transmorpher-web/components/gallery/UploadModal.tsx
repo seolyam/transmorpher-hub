@@ -85,7 +85,7 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
       return;
     }
     if (!exportString) {
-      setErrorMsg("Please paste your Transmorpher export string.");
+      setErrorMsg("Please paste your TM1 export string from the addon.");
       return;
     }
 
@@ -282,7 +282,7 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
             <textarea 
               value={exportString}
               onChange={(e) => setExportString(e.target.value)}
-              placeholder="Paste your Transmorpher addon export string here..."
+              placeholder="TM1|... from Loadouts → Export or /morph export"
               rows={4}
               className="bg-slate-950 border border-slate-800 rounded-md px-4 py-3 text-slate-50 font-mono text-xs focus:outline-none focus:border-epic-purple focus:ring-1 focus:ring-epic-purple/50 transition-all placeholder:text-slate-600 resize-none"
             />
