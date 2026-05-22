@@ -2,6 +2,7 @@
 
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { createServerClient } from "@/src/lib/supabase";
+import { isValidLoadoutExportString, loadoutExportHint } from "@/lib/loadoutCodec";
 
 const s3 = new S3Client({
   forcePathStyle: true,
@@ -24,6 +25,10 @@ export async function uploadLoadout(formData: FormData) {
 
     if (!title || !race || !gender || !visualWeight || !exportString || !file) {
       return { success: false, error: "Missing required fields" };
+    }
+
+    if (!isValidLoadoutExportString(exportString)) {
+      return { success: false, error: loadoutExportHint() };
     }
 
     // Convert file to Buffer
