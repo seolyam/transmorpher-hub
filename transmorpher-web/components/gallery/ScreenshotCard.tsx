@@ -22,17 +22,23 @@ function getGenderInitial(gender: string) {
 
 export default function ScreenshotCard({ item, priority }: ScreenshotCardProps) {
   const [copied, setCopied] = useState(false);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
-  const handleCopy = () => {
+  const handleCopy = (e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     navigator.clipboard.writeText(item.exportString);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <div className="group flex flex-col bg-slate-900 rounded-lg border border-slate-800 overflow-hidden hover:-translate-y-1 hover:shadow-glow-frost transition-all duration-300">
-      {/* Image Container */}
-      <div className="relative aspect-video w-full bg-slate-950 overflow-hidden">
+    <>
+      <div className="group flex flex-col bg-slate-900 rounded-lg border border-slate-800 overflow-hidden hover:-translate-y-1 hover:shadow-glow-frost transition-all duration-300">
+        {/* Image Container */}
+        <div 
+          className="relative aspect-video w-full bg-slate-950 overflow-hidden cursor-pointer"
+          onClick={() => setIsLightboxOpen(true)}
+        >
         <Image 
           src={item.imageUrl}
           alt={item.title}
@@ -89,5 +95,38 @@ export default function ScreenshotCard({ item, priority }: ScreenshotCardProps) 
         </div>
       </div>
     </div>
+
+    {/* Lightbox Modal */}
+    {isLightboxOpen && (
+        <div 
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/90 backdrop-blur-sm p-4 sm:p-8 animate-in fade-in duration-200"
+          onClick={() => setIsLightboxOpen(false)}
+        >
+          {/* Close button */}
+          <button 
+            className="absolute top-4 right-4 sm:top-8 sm:right-8 p-2 text-slate-400 hover:text-white bg-slate-900/50 hover:bg-slate-800 rounded-full backdrop-blur-md transition-all z-10"
+            onClick={() => setIsLightboxOpen(false)}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-6 h-6">
+              <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          
+          <div 
+            className="relative w-full max-w-7xl h-full max-h-[90vh] rounded-lg overflow-hidden shadow-2xl border border-slate-800"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image 
+              src={item.imageUrl}
+              alt={item.title}
+              fill
+              className="object-contain bg-slate-950"
+              sizes="100vw"
+              priority
+            />
+          </div>
+        </div>
+      )}
+    </>
   );
 }
