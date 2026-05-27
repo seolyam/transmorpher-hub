@@ -1,7 +1,9 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { createBrowserClient } from '@/utils/supabase/client';
+import type { User } from '@supabase/supabase-js';
 
 interface NavbarProps {
   onUploadClick: () => void;
@@ -9,6 +11,43 @@ interface NavbarProps {
 
 export default function Navbar({ onUploadClick }: NavbarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const supabase = createBrowserClient();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
+    };
+
+    fetchUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, [supabase.auth]);
+
+  const handleAuthClick = async () => {
+    if (user) {
+      await supabase.auth.signOut();
+      router.refresh();
+    } else {
+      router.push('/login');
+    }
+  };
+
+  const handleUploadClick = () => {
+    if (user) {
+      onUploadClick();
+    } else {
+      router.push('/login');
+    }
+  };
   return (
     <nav className="sticky top-0 z-40 w-full backdrop-blur-xl bg-slate-950/80 border-b border-slate-800">
       <div className="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between">
@@ -45,11 +84,14 @@ export default function Navbar({ onUploadClick }: NavbarProps) {
 
         {/* Actions */}
         <div className="flex items-center gap-4">
-          <button className="text-sm font-medium text-slate-300 hover:text-slate-50 px-4 py-2 transition-colors">
-            Sign In
+          <button 
+            onClick={handleAuthClick}
+            className="text-sm font-medium text-slate-300 hover:text-slate-50 px-4 py-2 transition-colors"
+          >
+            {user ? 'Sign Out' : 'Sign In'}
           </button>
           <button 
-            onClick={onUploadClick}
+            onClick={handleUploadClick}
             className="text-sm font-medium text-slate-950 bg-frost-blue hover:brightness-110 hover:shadow-glow-frost px-5 py-2 rounded-md transition-all duration-200"
           >
             Upload Loadout

@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Navbar from '@/components/gallery/Navbar';
 import ScreenshotCard from '@/components/gallery/ScreenshotCard';
 import UploadModal from '@/components/gallery/UploadModal';
-import { createBrowserClient } from '@/src/lib/supabase';
+import { createBrowserClient } from '@/utils/supabase/client';
 import { GalleryItem } from '@/lib/types';
 
 export const RACES = {
@@ -23,7 +23,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const supabase = createBrowserClient() as any;
+  const supabase = createBrowserClient();
 
   const fetchLoadouts = useCallback(async () => {
     try {
@@ -43,6 +43,7 @@ export default function Home() {
       }
 
       if (data) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const formatted: GalleryItem[] = data.map((loadout: any) => {
           // Extract upvote count
           const countWrapper = loadout.loadout_upvote_counts;
@@ -52,6 +53,7 @@ export default function Home() {
 
           return {
             id: loadout.id,
+            user_id: loadout.author_id,
             title: loadout.title,
             author: loadout.profiles?.username || 'Community',
             race: loadout.race || 'Unknown',
@@ -64,9 +66,10 @@ export default function Home() {
         });
         setItems(formatted);
       }
-    } catch (e: any) {
-      console.error('Failed to fetch loadouts:', e);
-      setError(e.message || 'Failed to load gallery transmogs.');
+    } catch (e: unknown) {
+      const error = e as Error;
+      console.error('Failed to fetch loadouts:', error);
+      setError(error.message || 'Failed to load gallery transmogs.');
     } finally {
       setLoading(false);
     }
@@ -74,6 +77,7 @@ export default function Home() {
 
   // Initial load
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchLoadouts();
   }, [fetchLoadouts]);
 

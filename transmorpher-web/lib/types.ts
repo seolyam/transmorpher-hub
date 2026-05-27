@@ -2,6 +2,7 @@ export type ClassName = 'Warrior' | 'Paladin' | 'Hunter' | 'Rogue' | 'Priest' | 
 
 export interface GalleryItem {
   id: string;
+  user_id: string;
   title: string;
   author: string;
   race: string;
