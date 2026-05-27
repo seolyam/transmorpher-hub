@@ -36,7 +36,7 @@ export default function ScreenshotCard({ item, priority }: ScreenshotCardProps) 
       <div className="group flex flex-col bg-slate-900 rounded-lg border border-slate-800 overflow-hidden hover:-translate-y-1 hover:shadow-glow-frost transition-all duration-300">
         {/* Image Container */}
         <div 
-          className="relative aspect-video w-full bg-slate-950 overflow-hidden cursor-pointer"
+          className="relative aspect-square w-full bg-slate-950 overflow-hidden cursor-pointer"
           onClick={() => setIsLightboxOpen(true)}
         >
         <Image 
@@ -113,17 +113,69 @@ export default function ScreenshotCard({ item, priority }: ScreenshotCardProps) 
           </button>
           
           <div 
-            className="relative w-full max-w-7xl h-full max-h-[90vh] rounded-lg overflow-hidden shadow-2xl border border-slate-800"
+            className="relative w-full max-w-5xl bg-slate-900 rounded-lg overflow-hidden shadow-2xl border border-slate-800 grid grid-cols-1 md:grid-cols-2 max-h-[90vh] overflow-y-auto md:overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
-            <Image 
-              src={item.imageUrl}
-              alt={item.title}
-              fill
-              className="object-contain bg-slate-950"
-              sizes="100vw"
-              priority
-            />
+            {/* Left Column: Image */}
+            <div className="relative w-full h-[50vh] md:h-[70vh] bg-slate-950">
+              <Image 
+                src={item.imageUrl}
+                alt={item.title}
+                fill
+                className="object-contain"
+                sizes="(max-width: 768px) 100vw, 50vw"
+                priority
+              />
+            </div>
+            
+            {/* Right Column: Details */}
+            <div className="p-6 md:p-8 flex flex-col gap-6 overflow-y-auto max-h-[70vh]">
+              <div>
+                <h2 className="text-2xl font-bold text-white mb-2">{item.title}</h2>
+                <div className="flex items-center gap-2 text-slate-400">
+                  <div className="w-6 h-6 rounded-full bg-slate-800 flex items-center justify-center text-xs text-slate-400">
+                    {item.author[0].toUpperCase()}
+                  </div>
+                  <span>by <span className="text-slate-300">{item.author}</span></span>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                <span className="px-3 py-1 text-xs font-bold tracking-wider uppercase rounded-full bg-frost-blue/10 text-frost-blue border border-frost-blue/20">
+                  {item.race} {getGenderInitial(item.gender)}
+                </span>
+                <span className={`px-3 py-1 text-xs font-bold tracking-wider uppercase rounded-full border ${weightColors[item.visualWeight] || weightColors['Medium']}`}>
+                  {item.visualWeight}
+                </span>
+              </div>
+
+              <div className="mt-auto pt-6 border-t border-slate-800">
+                <button
+                  onClick={handleCopy}
+                  className={`w-full py-3 px-4 rounded-md font-medium flex items-center justify-center gap-2 transition-all ${
+                    copied 
+                      ? 'bg-uncommon-green/20 text-uncommon-green border border-uncommon-green' 
+                      : 'bg-frost-blue hover:brightness-110 text-slate-950'
+                  }`}
+                >
+                  {copied ? (
+                    <>
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Copied to Clipboard!
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                      </svg>
+                      Copy Export String
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
