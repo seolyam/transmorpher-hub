@@ -65,15 +65,6 @@ export default function Navbar({ onUploadClick }: NavbarProps) {
 
         {/* Links */}
         <div className="hidden md:flex items-center gap-8">
-          <Link href="/" className={`text-sm font-medium transition-colors ${pathname === '/' ? 'text-frost-blue relative after:absolute after:bottom-[-22px] after:left-0 after:w-full after:h-0.5 after:bg-frost-blue' : 'text-slate-400 hover:text-slate-50'}`}>
-            Gallery
-          </Link>
-          <Link href="/trending" className={`text-sm font-medium transition-colors ${pathname === '/trending' ? 'text-frost-blue relative after:absolute after:bottom-[-22px] after:left-0 after:w-full after:h-0.5 after:bg-frost-blue' : 'text-slate-400 hover:text-slate-50'}`}>
-            Trending
-          </Link>
-          <Link href="/newest" className={`text-sm font-medium transition-colors ${pathname === '/newest' ? 'text-frost-blue relative after:absolute after:bottom-[-22px] after:left-0 after:w-full after:h-0.5 after:bg-frost-blue' : 'text-slate-400 hover:text-slate-50'}`}>
-            Newest
-          </Link>
           <a href="https://github.com/Kirazul/Transmorpher/releases" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-slate-400 hover:text-slate-50 transition-colors flex items-center gap-1 ml-4">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v4.59L7.3 9.4A.75.75 0 006.24 10.46l3.25 3.25a.75.75 0 001.06 0l3.25-3.25a.75.75 0 10-1.06-1.06l-1.95 1.95v-4.59z" clipRule="evenodd" />
