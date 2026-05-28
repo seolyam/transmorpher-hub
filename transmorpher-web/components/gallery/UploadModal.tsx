@@ -131,8 +131,9 @@ export default function UploadModal({ isOpen, onClose }: UploadModalProps) {
       } else {
         setErrorMsg(result.error || "Failed to publish loadout.");
       }
-    } catch (e: any) {
-      setErrorMsg(e.message || "An unexpected error occurred.");
+    } catch (e: unknown) {
+      const error = e as Error;
+      setErrorMsg(error.message || "An unexpected error occurred.");
     } finally {
       setIsCompressing(false);
       setIsUploading(false);

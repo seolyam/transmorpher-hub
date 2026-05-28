@@ -3,8 +3,9 @@ import { useState, useEffect, useCallback } from 'react';
 import Navbar from '@/components/gallery/Navbar';
 import ScreenshotCard from '@/components/gallery/ScreenshotCard';
 import UploadModal from '@/components/gallery/UploadModal';
-import { createBrowserClient } from '@/src/lib/supabase';
+import { createBrowserClient } from '@/utils/supabase/client';
 import { GalleryItem } from '@/lib/types';
+import Link from 'next/link';
 
 export const RACES = {
   Alliance: ['Human', 'Dwarf', 'Night Elf', 'Gnome', 'Draenei'],
@@ -22,19 +23,23 @@ export default function Home() {
   const [activeWeight, setActiveWeight] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
-  const supabase = createBrowserClient() as any;
+  const supabase = createBrowserClient();
 
   const fetchLoadouts = useCallback(async () => {
     try {
       setLoading(true);
       setError(null);
+      const { data: { user } } = await supabase.auth.getUser();
+      setCurrentUserId(user?.id || null);
+
       const { data, error: fetchError } = await supabase
         .from('loadouts')
         .select(`
           *,
-          profiles!loadouts_author_id_fkey ( username ),
-          loadout_upvote_counts ( upvote_count )
+          profiles ( username, avatar_url ),
+          likes ( user_id )
         `)
         .order('created_at', { ascending: false });
 
@@ -43,30 +48,33 @@ export default function Home() {
       }
 
       if (data) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const formatted: GalleryItem[] = data.map((loadout: any) => {
-          // Extract upvote count
-          const countWrapper = loadout.loadout_upvote_counts;
-          const upvotes = Array.isArray(countWrapper) && countWrapper.length > 0
-            ? countWrapper[0]?.upvote_count || 0
-            : 0;
+          const likesList = loadout.likes || [];
+          const likesCount = likesList.length;
+          const hasLiked = user ? likesList.some((l: any) => l.user_id === user.id) : false;
 
           return {
             id: loadout.id,
+            user_id: loadout.user_id,
             title: loadout.title,
-            author: loadout.profiles?.username || 'Community',
+            username: loadout.profiles?.username || 'Community',
+            avatar_url: loadout.profiles?.avatar_url || null,
             race: loadout.race || 'Unknown',
             gender: loadout.gender || 'Unknown',
             visualWeight: loadout.visual_weight || 'Medium',
-            upvotes: upvotes,
+            likesCount: likesCount,
+            hasLiked: hasLiked,
             imageUrl: loadout.image_url || '/placeholder.png',
             exportString: loadout.import_string,
           };
         });
         setItems(formatted);
       }
-    } catch (e: any) {
-      console.error('Failed to fetch loadouts:', e);
-      setError(e.message || 'Failed to load gallery transmogs.');
+    } catch (e: unknown) {
+      const error = e as Error;
+      console.error('Failed to fetch loadouts:', error);
+      setError(error.message || 'Failed to load gallery transmogs.');
     } finally {
       setLoading(false);
     }
@@ -74,6 +82,7 @@ export default function Home() {
 
   // Initial load
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchLoadouts();
   }, [fetchLoadouts]);
 
@@ -106,19 +115,33 @@ export default function Home() {
           Upload in-game screenshots and copy export strings instantly.
         </p>
 
-        {/* Filters Toggle */}
-        <button
-          onClick={() => setIsFilterOpen(!isFilterOpen)}
-          className="mt-4 px-6 py-2 rounded-full border border-slate-700 bg-slate-900 text-slate-300 font-medium hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-2"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-            <path fillRule="evenodd" d="M2.628 1.601C5.028 1.206 7.49 1 10 1s4.973.206 7.372.601a.75.75 0 01.628.74v2.288a2.25 2.25 0 01-.659 1.59l-4.682 4.683a2.25 2.25 0 00-.659 1.59v3.037c0 .684-.31 1.33-.844 1.757l-1.937 1.55A.75.75 0 018 18.25v-5.757a2.25 2.25 0 00-.659-1.591L2.659 6.22A2.25 2.25 0 012 4.629V2.34a.75.75 0 01.628-.74z" clipRule="evenodd" />
-          </svg>
-          {isFilterOpen ? 'Hide Filters' : 'Show Filters'}
-          {(activeRace || activeGender || activeWeight) && (
-            <span className="ml-1 w-2 h-2 rounded-full bg-frost-blue shadow-glow-frost"></span>
-          )}
-        </button>
+        {/* Sort & Filters */}
+        <div className="mt-4 flex flex-wrap items-center justify-center gap-4">
+          <div className="flex bg-slate-900/80 p-1 rounded-full border border-slate-800 backdrop-blur-sm">
+            <Link href="/" className="px-5 py-1.5 rounded-full text-sm font-medium transition-colors bg-slate-800 text-white shadow-sm">
+              Discover
+            </Link>
+            <Link href="/trending" className="px-5 py-1.5 rounded-full text-sm font-medium transition-colors text-slate-400 hover:text-slate-200">
+              Trending
+            </Link>
+            <Link href="/newest" className="px-5 py-1.5 rounded-full text-sm font-medium transition-colors text-slate-400 hover:text-slate-200">
+              Newest
+            </Link>
+          </div>
+
+          <button
+            onClick={() => setIsFilterOpen(!isFilterOpen)}
+            className="px-6 py-2 rounded-full border border-slate-700 bg-slate-900 text-slate-300 font-medium hover:bg-slate-800 hover:text-white transition-colors flex items-center gap-2"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+              <path fillRule="evenodd" d="M2.628 1.601C5.028 1.206 7.49 1 10 1s4.973.206 7.372.601a.75.75 0 01.628.74v2.288a2.25 2.25 0 01-.659 1.59l-4.682 4.683a2.25 2.25 0 00-.659 1.59v3.037c0 .684-.31 1.33-.844 1.757l-1.937 1.55A.75.75 0 018 18.25v-5.757a2.25 2.25 0 00-.659-1.591L2.659 6.22A2.25 2.25 0 012 4.629V2.34a.75.75 0 01.628-.74z" clipRule="evenodd" />
+            </svg>
+            {isFilterOpen ? 'Hide Filters' : 'Show Filters'}
+            {(activeRace || activeGender || activeWeight) && (
+              <span className="ml-1 w-2 h-2 rounded-full bg-frost-blue shadow-glow-frost"></span>
+            )}
+          </button>
+        </div>
 
         {/* Collapsible Filters Section */}
         {isFilterOpen && (
@@ -262,7 +285,7 @@ export default function Home() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 animate-in fade-in duration-300">
             {filteredItems.map((item, index) => (
-              <ScreenshotCard key={item.id} item={item} priority={index < 3} />
+              <ScreenshotCard key={item.id} item={item} priority={index < 3} currentUserId={currentUserId} onUpdate={fetchLoadouts} />
             ))}
           </div>
         )}

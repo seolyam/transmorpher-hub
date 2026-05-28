@@ -1,7 +1,9 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import { createBrowserClient } from '@/utils/supabase/client';
+import type { User } from '@supabase/supabase-js';
 
 interface NavbarProps {
   onUploadClick: () => void;
@@ -9,6 +11,43 @@ interface NavbarProps {
 
 export default function Navbar({ onUploadClick }: NavbarProps) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [user, setUser] = useState<User | null>(null);
+  const supabase = createBrowserClient();
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
+    };
+
+    fetchUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, [supabase.auth]);
+
+  const handleAuthClick = async () => {
+    if (user) {
+      await supabase.auth.signOut();
+      router.refresh();
+    } else {
+      router.push('/login');
+    }
+  };
+
+  const handleUploadClick = () => {
+    if (user) {
+      onUploadClick();
+    } else {
+      router.push('/login');
+    }
+  };
   return (
     <nav className="sticky top-0 z-40 w-full backdrop-blur-xl bg-slate-950/80 border-b border-slate-800">
       <div className="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between">
@@ -26,15 +65,6 @@ export default function Navbar({ onUploadClick }: NavbarProps) {
 
         {/* Links */}
         <div className="hidden md:flex items-center gap-8">
-          <Link href="/" className={`text-sm font-medium transition-colors ${pathname === '/' ? 'text-frost-blue relative after:absolute after:bottom-[-22px] after:left-0 after:w-full after:h-0.5 after:bg-frost-blue' : 'text-slate-400 hover:text-slate-50'}`}>
-            Gallery
-          </Link>
-          <Link href="/trending" className={`text-sm font-medium transition-colors ${pathname === '/trending' ? 'text-frost-blue relative after:absolute after:bottom-[-22px] after:left-0 after:w-full after:h-0.5 after:bg-frost-blue' : 'text-slate-400 hover:text-slate-50'}`}>
-            Trending
-          </Link>
-          <Link href="/newest" className={`text-sm font-medium transition-colors ${pathname === '/newest' ? 'text-frost-blue relative after:absolute after:bottom-[-22px] after:left-0 after:w-full after:h-0.5 after:bg-frost-blue' : 'text-slate-400 hover:text-slate-50'}`}>
-            Newest
-          </Link>
           <a href="https://github.com/Kirazul/Transmorpher/releases" target="_blank" rel="noopener noreferrer" className="text-sm font-medium text-slate-400 hover:text-slate-50 transition-colors flex items-center gap-1 ml-4">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
               <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm.75-11.25a.75.75 0 00-1.5 0v4.59L7.3 9.4A.75.75 0 006.24 10.46l3.25 3.25a.75.75 0 001.06 0l3.25-3.25a.75.75 0 10-1.06-1.06l-1.95 1.95v-4.59z" clipRule="evenodd" />
@@ -45,11 +75,14 @@ export default function Navbar({ onUploadClick }: NavbarProps) {
 
         {/* Actions */}
         <div className="flex items-center gap-4">
-          <button className="text-sm font-medium text-slate-300 hover:text-slate-50 px-4 py-2 transition-colors">
-            Sign In
+          <button 
+            onClick={handleAuthClick}
+            className="text-sm font-medium text-slate-300 hover:text-slate-50 px-4 py-2 transition-colors"
+          >
+            {user ? 'Sign Out' : 'Sign In'}
           </button>
           <button 
-            onClick={onUploadClick}
+            onClick={handleUploadClick}
             className="text-sm font-medium text-slate-950 bg-frost-blue hover:brightness-110 hover:shadow-glow-frost px-5 py-2 rounded-md transition-all duration-200"
           >
             Upload Loadout
