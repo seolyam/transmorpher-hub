@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { createBrowserClient } from '@/utils/supabase/client';
 import type { User } from '@supabase/supabase-js';
@@ -53,10 +54,14 @@ export default function Navbar({ onUploadClick }: NavbarProps) {
       <div className="max-w-[1440px] mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 rounded-md bg-slate-900 border border-frost-blue/30 shadow-glow-frost flex items-center justify-center text-frost-blue group-hover:bg-frost-blue/10 transition-colors">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-              <path d="m10 20-2.5-3.5"></path><path d="M12 22v-8"></path><path d="m14 20 2.5-3.5"></path><path d="m10 4-2.5 3.5"></path><path d="M12 2v8"></path><path d="m14 4 2.5 3.5"></path><path d="m20 10-3.5-2.5"></path><path d="M22 12h-8"></path><path d="m20 14-3.5 2.5"></path><path d="m4 10 3.5-2.5"></path><path d="M2 12h8"></path><path d="m4 14 3.5 2.5"></path>
-            </svg>
+          <div className="relative w-10 h-10 rounded-md overflow-hidden border border-frost-blue/30 shadow-glow-frost group-hover:border-frost-blue/60 transition-colors">
+            <Image 
+              src="/logo-icon.png" 
+              alt="Transmorpher Hub Logo" 
+              fill
+              className="object-cover"
+              sizes="40px"
+            />
           </div>
           <span className="font-space font-bold text-lg tracking-tight group-hover:text-slate-300 transition-colors">
             TRANSMORPHER HUB

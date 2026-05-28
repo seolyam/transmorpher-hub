@@ -65,16 +65,7 @@ export default function LoginPage() {
         </Link>
 
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 group mb-6">
-            <div className="w-8 h-8 rounded-md bg-slate-900 border border-frost-blue/30 shadow-glow-frost flex items-center justify-center text-frost-blue group-hover:bg-frost-blue/10 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
-                <path d="m10 20-2.5-3.5"></path><path d="M12 22v-8"></path><path d="m14 20 2.5-3.5"></path><path d="m10 4-2.5 3.5"></path><path d="M12 2v8"></path><path d="m14 4 2.5 3.5"></path><path d="m20 10-3.5-2.5"></path><path d="M22 12h-8"></path><path d="m20 14-3.5 2.5"></path><path d="m4 10 3.5-2.5"></path><path d="M2 12h8"></path><path d="m4 14 3.5 2.5"></path>
-              </svg>
-            </div>
-            <span className="font-space font-bold text-lg tracking-tight group-hover:text-slate-300 transition-colors text-white">
-              TRANSMORPHER HUB
-            </span>
-          </Link>
+
           <h1 className="text-2xl font-bold text-white mb-2">
             Join Transmorpher Hub
           </h1>
