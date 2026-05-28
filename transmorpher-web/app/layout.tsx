@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { createServerClient } from "@/utils/supabase/server";
+import SetUsernameModal from "@/components/auth/SetUsernameModal";
 
 export const metadata: Metadata = {
   title: "Transmorpher Hub — WotLK Transmog Community",
@@ -24,11 +26,22 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createServerClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  
+  let needsUsername = false;
+  if (user) {
+    const { data: profile } = await supabase.from('profiles').select('username').eq('id', user.id).single();
+    if (!profile || !profile.username) {
+      needsUsername = true;
+    }
+  }
+
   return (
     <html lang="en" className="dark h-full antialiased" suppressHydrationWarning>
       <head>
@@ -40,6 +53,7 @@ export default function RootLayout({
       </head>
       <body className="min-h-full flex flex-col bg-slate-950 text-slate-50">
         <div className="flex-1 flex flex-col relative z-0">
+          {needsUsername && <SetUsernameModal />}
           {children}
         </div>
         <footer className="w-full border-t border-slate-800 bg-slate-950 mt-auto relative z-10">
