@@ -73,7 +73,7 @@ export async function uploadLoadout(formData: FormData) {
         visual_weight: visualWeight,
         import_string: exportString,
         image_url: imageUrl,
-        author_id: userId,
+        user_id: userId,
         parsed_data: { items: [] },
       })
       .select()
@@ -88,5 +88,112 @@ export async function uploadLoadout(formData: FormData) {
     const err = error as Error;
     console.error("Upload action error:", err);
     return { success: false, error: err.message || "An unexpected error occurred." };
+  }
+}
+
+export async function claimUsername(username: string) {
+  try {
+    const supabase = await createServerClient();
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session || !session.user) {
+      return { success: false, error: "Not authenticated" };
+    }
+    
+    // Extract avatar URL from session metadata
+    const metadata = session.user.user_metadata;
+    const avatarUrl = metadata.avatar_url || metadata.picture || null;
+    
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        username: username,
+        avatar_url: avatarUrl
+      })
+      .eq('id', session.user.id);
+      
+    if (error) {
+      if (error.code === '23505') {
+        return { success: false, error: "Username is already taken." };
+      }
+      return { success: false, error: error.message };
+    }
+    
+    return { success: true };
+  } catch (error: unknown) {
+    const err = error as Error;
+    return { success: false, error: err.message };
+  }
+}
+
+export async function toggleLike(loadoutId: string, hasLiked: boolean) {
+  try {
+    const supabase = await createServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) return { success: false, error: "Not authenticated" };
+    
+    if (hasLiked) {
+      const { error } = await supabase
+        .from("likes")
+        .delete()
+        .match({ user_id: user.id, loadout_id: loadoutId });
+        
+      if (error) return { success: false, error: error.message };
+    } else {
+      const { error } = await supabase
+        .from("likes")
+        .insert({ user_id: user.id, loadout_id: loadoutId });
+        
+      if (error) return { success: false, error: error.message };
+    }
+    
+    return { success: true };
+  } catch (error: unknown) {
+    const err = error as Error;
+    return { success: false, error: err.message };
+  }
+}
+
+export async function submitComment(loadoutId: string, content: string) {
+  try {
+    const supabase = await createServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) return { success: false, error: "Not authenticated" };
+    
+    if (!content.trim()) return { success: false, error: "Comment cannot be empty." };
+    
+    const { error } = await supabase
+      .from("comments")
+      .insert({ user_id: user.id, loadout_id: loadoutId, content: content.trim() });
+      
+    if (error) return { success: false, error: error.message };
+    
+    return { success: true };
+  } catch (error: unknown) {
+    const err = error as Error;
+    return { success: false, error: err.message };
+  }
+}
+
+export async function deleteLoadout(loadoutId: string) {
+  try {
+    const supabase = await createServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) return { success: false, error: "Not authenticated" };
+    
+    const { error } = await supabase
+      .from("loadouts")
+      .delete()
+      .match({ id: loadoutId, user_id: user.id });
+      
+    if (error) return { success: false, error: error.message };
+    
+    return { success: true };
+  } catch (error: unknown) {
+    const err = error as Error;
+    return { success: false, error: err.message };
   }
 }

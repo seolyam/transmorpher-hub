@@ -4,11 +4,13 @@ export interface GalleryItem {
   id: string;
   user_id: string;
   title: string;
-  author: string;
+  username: string;
+  avatar_url: string | null;
   race: string;
   gender: string;
   visualWeight: string;
-  upvotes: number;
+  likesCount: number;
+  hasLiked: boolean;
   imageUrl: string;
   exportString: string;
 }
