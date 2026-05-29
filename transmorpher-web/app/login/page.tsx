@@ -18,6 +18,9 @@ export default function LoginPage() {
         provider: 'discord',
         options: {
           redirectTo: `${window.location.origin}/auth/callback`,
+          queryParams: {
+            prompt: 'none', 
+          },
         },
       });
       if (error) throw error;
